@@ -1,61 +1,64 @@
-//package pl.polsl.projekt.controller;
-//
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.PageRequest;
-//import org.springframework.data.domain.Pageable;
-//import org.springframework.data.domain.Sort;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RequestParam;
-//import org.springframework.web.bind.annotation.RestController;
-//import pl.polsl.projekt.model.Teacher;
-//import pl.polsl.projekt.repository.TeacherRepository;
-//
-//import java.util.List;
-//
-//@RestController
-//@RequestMapping("/teachers")
-//@RequiredArgsConstructor
-//public class TestController {
-//
-//    private final TeacherRepository teacherRepository;
-//
-//    // http://localhost:8081/teachers/get/?firstName=Mariusz&surname=Pudzianowski
-//    @GetMapping("/get")
-//    Teacher getTeachersByFirstNameAndSurname(@RequestParam String firstName, @RequestParam String surname) {
-//        return teacherRepository.findByFirstNameAndSurname(firstName, surname);
-//    }
-//
-//    // http://localhost:8081/teachers/getPage/?firstName=Mariusz&surname=Pudzianowski
-//    @GetMapping("/getPage")
-//    Page<Teacher> getTeachersByFirstNameAndSurnameSortedAndPaginated(@RequestParam String firstName,
-//                                                                     @RequestParam String surname,
-//                                                                     @RequestParam(defaultValue = "0") int page,
-//                                                                     @RequestParam(defaultValue = "1") int size,
-//                                                                     @RequestParam(defaultValue = "desc") String sortDirection,
-//                                                                     @RequestParam(defaultValue = "firstName") String sortColumn) {
-//        Sort.Order order = new Sort.Order(Sort.Direction.fromString(sortDirection), sortColumn);
-//        Pageable pagingSort = PageRequest.of(page, size, Sort.by(order));
-//        return teacherRepository.findAllByFirstNameAndSurname(firstName, surname, pagingSort);
-//
-//    }
-//
-//    // http://localhost:8081/teachers/getLike/?firstName=mAri
-//    @GetMapping("/getLike")
-//    List<Teacher> getTeachersByFirstNameLike(@RequestParam String firstName) {
-//        return teacherRepository.findAllByFirstNameContainingIgnoreCase(firstName);
-//    }
-//
-//    // http://localhost:8081/teachers/getOr/?firstName=Mariusz&surname=Kolonko
-//    @GetMapping("/getOr")
-//    List<Teacher> getTeachersByName(@RequestParam String firstName, String surname) {
-//        return teacherRepository.findAllByFirstNameOrSurname(firstName, surname);
-//    }
-//
-//    // http://localhost:8081/teachers/getQuery/?title=professor
-//    @GetMapping("/getQuery")
-//    List<Teacher> getTeachersByName(@RequestParam String title) {
-//        return teacherRepository.findAllByTitle(title);
-//    }
-//}
+package pl.polsl.projekt.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import pl.polsl.projekt.model.Test;
+import pl.polsl.projekt.repository.TestRepository;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@RestController
+@RequestMapping("/tests")
+@RequiredArgsConstructor
+public class TestController {
+
+    private final TestRepository testRepository;
+
+    // http://localhost:8081/tests/get/?name=Kinematic&date=2022-11-20
+    @GetMapping("/get")
+    Test getTestsByFirstNameAndSurname(@RequestParam String name,
+                                       @DateTimeFormat(pattern = "yyyy-MM-dd")@RequestParam("date") LocalDate date){
+        return testRepository.findByNameAndDate(name, date);
+    }
+
+
+    // http://localhost:8081/tests/getPage/?name=Kinematic&date=2022-11-20
+    @GetMapping("/getPage")
+    Page<Test> getTestsByNameAndDateSortedAndPaginated(@RequestParam String name,
+                                                       @DateTimeFormat(pattern = "yyyy-MM-dd")@RequestParam("date") LocalDate date,
+                                                       @RequestParam(defaultValue = "0") int page,
+                                                       @RequestParam(defaultValue = "1") int size,
+                                                       @RequestParam(defaultValue = "desc") String sortDirection,
+                                                       @RequestParam(defaultValue = "name") String sortColumn) {
+        Sort.Order order = new Sort.Order(Sort.Direction.fromString(sortDirection), sortColumn);
+        Pageable pagingSort = PageRequest.of(page, size, Sort.by(order));
+        return testRepository.findAllByNameAndDate(name, date, pagingSort);
+
+    }
+    // http://localhost:8081/tests/getLike/?name=alG
+    @GetMapping("/getLike")
+    List<Test> getTestsByFirstNameLike(@RequestParam String name) {
+        return testRepository.findAllByNameContainingIgnoreCase(name);
+    }
+
+    // http://localhost:8081/tests/getDistinct/?name=Kinematic&grade=5.0
+    @GetMapping("/getDistinct")
+    List<Test> getDistinctTestsByNameOrGrade(@RequestParam String name, Double grade) {
+        return testRepository.findDistinctByNameOrGrade(name, grade);
+    }
+
+    // http://localhost:8081/tests/getQuery/?grade=3.0
+    @GetMapping("/getQuery")
+    List<Test> getTestsByGrade(@RequestParam Double grade) {
+        return testRepository.findAllByGrade(grade);
+    }
+}

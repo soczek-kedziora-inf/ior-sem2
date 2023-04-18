@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.polsl.projekt.model.Subject;
-import pl.polsl.projekt.model.Teacher;
 import pl.polsl.projekt.repository.SubjectRepository;
-import pl.polsl.projekt.repository.TeacherRepository;
 
 import java.util.List;
 
@@ -32,32 +30,32 @@ public class SubjectController {
 
     // http://localhost:8081/subjects/getPage/?name=algebra
     @GetMapping("/getPage")
-    Page<Subject> getSubjectByName(@RequestParam String name,
+    Page<Subject> getSubjectByNameSortedAndPaginated(@RequestParam String name,
                                    @RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "1") int size,
                                    @RequestParam(defaultValue = "desc") String sortDirection,
-                                   @RequestParam(defaultValue = "firstName") String sortColumn) {
+                                   @RequestParam(defaultValue = "name") String sortColumn) {
         Sort.Order order = new Sort.Order(Sort.Direction.fromString(sortDirection), sortColumn);
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(order));
         return subjectRepository.findAllByName(name, pagingSort);
 
     }
+
+    // http://localhost:8081/subjects/getLike/?name=aLg
+    @GetMapping("/getLike")
+    List<Subject> getSubjectByNameLike(@RequestParam String name){
+        return subjectRepository.findAllByNameContainingIgnoreCase(name);
+    }
+
+    // http://localhost:8081/subjects/getDistinct/?id=1&name=algebra
+    @GetMapping("/getDistinct")
+    List<Subject> getDistinctTestByIdOrName(@RequestParam int id, String name) {
+        return subjectRepository.findDistinctByIdOrName(id, name);
+    }
 //
-//    // http://localhost:8081/subjects/getLike/?firstName=mAri
-//    @GetMapping("/getLike")
-//    List<Subject> getTeachersByFirstNameLike(@RequestParam String firstName) {
-//        return teacherRepository.findAllByFirstNameContainingIgnoreCase(firstName);
-//    }
-//
-//    // http://localhost:8081/subjects/getOr/?firstName=Mariusz&surname=Kolonko
-//    @GetMapping("/getOr")
-//    List<Subject> getTeachersByName(@RequestParam String firstName, String surname) {
-//        return teacherRepository.findAllByFirstNameOrSurname(firstName, surname);
-//    }
-//
-//    // http://localhost:8081/subjects/getQuery/?title=professor
-//    @GetMapping("/getQuery")
-//    List<Subject> getTeachersByName(@RequestParam String title) {
-//        return teacherRepository.findAllByTitle(title);
-//    }
+    //http://localhost:8081/subjects/getQuery/?name=Sociology
+    @GetMapping("/getQuery")
+    List<Subject> getAllSubjectByName(@RequestParam String name) {
+        return subjectRepository.findAllByName(name);
+    }
 }
